@@ -2,29 +2,20 @@ package main
 
 import (
 	"fmt"
+	"github.com/mradile/rssfeeder"
+	"github.com/mradile/rssfeeder/pkg/server/adding"
+	"github.com/mradile/rssfeeder/pkg/server/configuration"
+	"github.com/mradile/rssfeeder/pkg/server/deleting"
+	"github.com/mradile/rssfeeder/pkg/server/http"
+	"github.com/mradile/rssfeeder/pkg/server/storage"
+	"github.com/mradile/rssfeeder/pkg/server/viewing"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+	"golang.org/x/crypto/bcrypt"
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/mradile/rssfeeder/pkg/server/viewing"
-
-	"github.com/mradile/rssfeeder/pkg/server/deleting"
-
-	"github.com/mradile/rssfeeder/pkg/server/adding"
-
-	"github.com/mradile/rssfeeder/pkg/server/http"
-
-	"golang.org/x/crypto/bcrypt"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/mradile/rssfeeder"
-
-	"github.com/mradile/rssfeeder/pkg/server/storage"
-
-	"github.com/mradile/rssfeeder/pkg/server/configuration"
-
-	"github.com/urfave/cli"
 )
 
 var version = "dev-snapshot"
@@ -108,7 +99,7 @@ func main() {
 				cfg := makeConfig(c)
 				db, err := storage.NewStormDB(cfg)
 				if err != nil {
-					return err
+					return cli.NewExitError(errors.Wrap(err, "could not open database"), 1)
 				}
 				defer db.Close()
 
@@ -119,7 +110,7 @@ func main() {
 				viewer := viewing.NewViewingService(feedEntries)
 
 				if err := createUser(user, c); err != nil {
-					return err
+					return cli.NewExitError(errors.Wrap(err, "could not create user"), 1)
 				}
 
 				server := http.NewServer(cfg, user, adder, deleter, viewer)
