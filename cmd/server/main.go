@@ -110,6 +110,7 @@ func main() {
 				if err != nil {
 					return err
 				}
+				defer db.Close()
 
 				user := storage.NewUserStorage(db)
 				feedEntries := storage.NewFeedEntryStorage(db)
