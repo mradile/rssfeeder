@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/mradile/rssfeeder"
 	"github.com/mradile/rssfeeder/pkg/server/adding"
@@ -14,6 +15,7 @@ import (
 	"github.com/urfave/cli"
 	"golang.org/x/crypto/bcrypt"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 )
@@ -101,10 +103,10 @@ func main() {
 				if err != nil {
 					return cli.NewExitError(errors.Wrap(err, "could not open database"), 1)
 				}
-				defer db.Close()
 
 				user := storage.NewUserStorage(db)
 				feedEntries := storage.NewFeedEntryStorage(db)
+
 				adder := adding.NewAddingService(feedEntries)
 				deleter := deleting.NewDeletingService(feedEntries)
 				viewer := viewing.NewViewingService(feedEntries)
@@ -113,8 +115,46 @@ func main() {
 					return cli.NewExitError(errors.Wrap(err, "could not create user"), 1)
 				}
 
+				quit := make(chan os.Signal)
+				signal.Notify(quit, os.Interrupt)
+
 				server := http.NewServer(cfg, user, adder, deleter, viewer)
-				return server.Start()
+				go func() {
+					logrus.WithFields(logrus.Fields{
+						"addr": cfg.Addr,
+					}).Info("starting server")
+					if err := server.Start(); err != nil {
+						logrus.WithFields(logrus.Fields{
+							"reason": err,
+						}).Info("shutting down the server")
+						quit <- os.Interrupt
+					}
+				}()
+
+				<-quit
+				logrus.Info("received a stop signal")
+
+				//close db connection
+				if err := db.Close(); err != nil {
+					logrus.WithFields(logrus.Fields{
+						"error": err,
+					}).Fatal("errors during closing db connection")
+				} else {
+					logrus.Info("db connection closed")
+				}
+
+				//close http connections
+				ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+				defer cancel()
+				if err := server.Shutdown(ctx); err != nil {
+					logrus.WithFields(logrus.Fields{
+						"error": err,
+					}).Fatal("errors during shutdown")
+				} else {
+					logrus.Info("http server closed")
+				}
+
+				return nil
 			},
 			Flags: []cli.Flag{},
 		},
