@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 import (
 	"github.com/pkg/errors"
@@ -25,6 +25,8 @@ func (c *client) Login() cli.Command {
 			Client.cfg = &configuration.Configuration{
 				Hostname: hostname,
 			}
+
+			//ToDo read password from term when omitted
 
 			loginReq := &rest.LoginRequest{
 				Login:    c.String("login"),

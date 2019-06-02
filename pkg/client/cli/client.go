@@ -1,13 +1,13 @@
-package cmd
+package cli
 
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/mradile/rssfeeder/pkg/client/configuration"
 	"github.com/urfave/cli"
 	"io"
 	"net/http"
-
-	"github.com/mradile/rssfeeder/pkg/client/configuration"
+	"time"
 )
 
 type client struct {
@@ -18,7 +18,9 @@ type client struct {
 }
 
 var Client = &client{
-	http: &http.Client{},
+	http: &http.Client{
+		Timeout: time.Duration(time.Second * 60),
+	},
 }
 
 func toJSONBytes(data interface{}) (io.Reader, error) {

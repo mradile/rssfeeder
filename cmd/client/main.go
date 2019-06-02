@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mradile/rssfeeder/pkg/client/cmd"
+	c "github.com/mradile/rssfeeder/pkg/client/cli"
 
 	"github.com/urfave/cli"
 )
@@ -43,9 +43,9 @@ func main() {
 	}
 
 	cmds := make([]cli.Command, 0)
-	cmds = append(cmds, cmd.Client.Login())
-	cmds = append(cmds, cmd.Client.AddEntry())
-	cmds = append(cmds, cmd.Client.ListFeeds())
+	cmds = append(cmds, c.Client.Login())
+	cmds = append(cmds, c.Client.AddEntry())
+	cmds = append(cmds, c.Client.ListFeeds())
 	cliApp.Commands = cmds
 
 	err := cliApp.Run(os.Args)
