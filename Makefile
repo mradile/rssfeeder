@@ -15,7 +15,7 @@ install:
 
 .PHONY: vet
 vet:
-	go vet cmd/server/*.go && go vet cmd/client/*.go
+	go vet cmd/rssfeeder/*.go && go vet cmd/rssfeederd/*.go
 
 .PHONY: lint
 lint:
