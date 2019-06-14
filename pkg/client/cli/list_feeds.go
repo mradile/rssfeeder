@@ -27,7 +27,10 @@ func (c *client) ListFeeds() cli.Command {
 			if err != nil {
 				return cli.NewExitError(errors.Wrap(err, "could not list feeds"), 1)
 			}
-			Client.setAuthHeader(req)
+			err = Client.setAuthHeader(req)
+			if err != nil {
+				return cli.NewExitError(errors.Wrap(err, "could not list feeds"), 1)
+			}
 
 			var list rest.FeedListResponse
 			if err := Client.getResponse(req, &list, http.StatusOK); err != nil {

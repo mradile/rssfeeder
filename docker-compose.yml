@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  rssfeeder:
+    image: mradile/rssfeeder:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - rssfeeder-data:/data
+    environment:
+      DB: /data
+      HOST: http://localhost:3000
+      SECRET: someSecret
+      CREATE_USER: 1
+      LOGIN: martin
+      PASSWORD: martin
+
+volumes:
+  rssfeeder-data:
+    driver: local

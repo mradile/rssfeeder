@@ -1,31 +1,47 @@
 package adding
 
 import (
-	"errors"
 	"github.com/mradile/rssfeeder"
+	"github.com/pkg/errors"
 )
-
-type AddingService interface {
-	AddFeedEntry(entry *rssfeeder.FeedEntry) error
-}
 
 type adder struct {
 	entries rssfeeder.FeedEntryStorage
+	feeds   rssfeeder.FeedStorage
 }
 
-func NewAddingService(entryStore rssfeeder.FeedEntryStorage) AddingService {
+func NewAddingService(entries rssfeeder.FeedEntryStorage, feeds rssfeeder.FeedStorage) rssfeeder.AddingService {
 	a := &adder{
-		entries: entryStore,
+		entries: entries,
+		feeds:   feeds,
 	}
 	return a
 }
 
 func (a *adder) AddFeedEntry(entry *rssfeeder.FeedEntry) error {
 	if entry.Login == "" {
-		return errors.New("invalid login")
+		return rssfeeder.ErrEmptyLogin
 	}
-	if entry.Category == "" {
-		entry.Category = rssfeeder.DefaultCategory
+	if entry.URI == "" {
+		return rssfeeder.ErrEmptyURI
+	}
+
+	if entry.FeedName == "" {
+		entry.FeedName = rssfeeder.DefaultFeedName
+	}
+
+	exists, err := a.feeds.Exists(entry.FeedName, entry.Login)
+	if err != nil {
+		return errors.Wrap(err, "could not fetch feed for adding feed entry")
+	}
+	if !exists {
+		feed := &rssfeeder.Feed{
+			Name:  entry.FeedName,
+			Login: entry.Login,
+		}
+		if err := a.feeds.Add(feed); err != nil {
+			return errors.Wrap(err, "could not create new feed for adding feed entry")
+		}
 	}
 
 	if err := a.entries.Add(entry); err != nil {

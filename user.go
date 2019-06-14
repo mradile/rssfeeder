@@ -1,5 +1,7 @@
 package rssfeeder
 
+//go:generate mockgen -destination=pkg/server/mock/user.go -package=mock github.com/mradile/rssfeeder UserStorage
+
 type User struct {
 	ID       int
 	Login    string

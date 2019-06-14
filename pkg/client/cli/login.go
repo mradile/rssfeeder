@@ -42,11 +42,12 @@ func (c *client) Login() cli.Command {
 				return cli.NewExitError(errors.Wrap(err, "could not login"), 1)
 			}
 
-			if token.Token == "" {
+			if token.AccessToken == "" || token.RefreshToken == "" {
 				return cli.NewExitError("could not login, received empty token", 1)
 			}
 
-			Client.cfg.Token = token.Token
+			Client.cfg.AccessToken = token.AccessToken
+			Client.cfg.RefreshToken = token.RefreshToken
 			Client.cfg.Login = loginReq.Login
 
 			if err := configuration.Save(Client.cfg, c.GlobalString("cfg")); err != nil {
@@ -57,13 +58,13 @@ func (c *client) Login() cli.Command {
 		},
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:   "login",
+				Name:   "login, l",
 				Usage:  "`username`",
 				EnvVar: "LOGIN",
 				Value:  "",
 			},
 			cli.StringFlag{
-				Name:   "password",
+				Name:   "password, p",
 				Usage:  "`password`",
 				EnvVar: "PASSWORD",
 				Value:  "",

@@ -1,12 +1,10 @@
 package storage
 
 import (
-	"path"
-
-	"github.com/sirupsen/logrus"
-
 	"github.com/asdine/storm"
 	"github.com/mradile/rssfeeder/pkg/server/configuration"
+	"github.com/sirupsen/logrus"
+	"path"
 )
 
 const dbFileName = "rssfeeder.db"

@@ -1,44 +1,40 @@
 package viewing
 
 import (
-	"errors"
-
 	"github.com/mradile/rssfeeder"
 )
 
-type ViewingService interface {
-	GetCategories(login string) ([]string, error)
-	GetFeed(category string, login string) ([]*rssfeeder.FeedEntry, error)
-}
-
 type viewer struct {
 	entries rssfeeder.FeedEntryStorage
+	feeds   rssfeeder.FeedStorage
 }
 
-func NewViewingService(entryStore rssfeeder.FeedEntryStorage) ViewingService {
+func NewViewingService(entryStore rssfeeder.FeedEntryStorage, feeds rssfeeder.FeedStorage) rssfeeder.ViewingService {
 	v := &viewer{
 		entries: entryStore,
+		feeds:   feeds,
 	}
 	return v
 }
 
-func (v *viewer) GetCategories(login string) ([]string, error) {
+func (v *viewer) GetFeeds(login string) ([]*rssfeeder.Feed, error) {
 	if login == "" {
-		return nil, errors.New("invalid login")
+		return nil, rssfeeder.ErrEmptyLogin
 	}
-	categories, err := v.entries.GetCategories(login)
+
+	feeds, err := v.feeds.GetFeedsByLogin(login)
 	if err != nil {
 		return nil, err
 	}
-	return categories, nil
+	return feeds, nil
 }
 
-func (v *viewer) GetFeed(category string, login string) ([]*rssfeeder.FeedEntry, error) {
+func (v *viewer) GetFeed(feedName string, login string) ([]*rssfeeder.FeedEntry, error) {
 	if login == "" {
-		return nil, errors.New("invalid login")
+		return nil, rssfeeder.ErrEmptyLogin
 	}
-	if category == "" {
-		category = rssfeeder.DefaultCategory
+	if feedName == "" {
+		feedName = rssfeeder.DefaultFeedName
 	}
-	return v.entries.AllByLoginAndCategory(login, category)
+	return v.entries.AllByLoginAndFeedName(login, feedName)
 }

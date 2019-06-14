@@ -1,32 +1,15 @@
 package storage
 
 import (
-	"os"
-	"path"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/mradile/rssfeeder/pkg/server/configuration"
-
-	"github.com/asdine/storm"
 	"github.com/mradile/rssfeeder"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
-
-func getDB() (*storm.DB, error) {
-	tmpPath := os.TempDir()
-	dbFilePath := path.Join(os.TempDir(), dbFileName)
-	os.Remove(dbFilePath)
-	cfg := &configuration.Configuration{
-		DBPath: tmpPath,
-	}
-	return NewStormDB(cfg)
-}
 
 func Test_userStorage(t *testing.T) {
 	db, err := getDB()
-	defer db.Close()
 	assert.Nil(t, err)
+	defer db.Close()
 	s := NewUserStorage(db)
 
 	//add user1

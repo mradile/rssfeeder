@@ -7,6 +7,7 @@ require (
 	github.com/Sereal/Sereal v0.0.0-20190523190202-f3c5c39c5c5d // indirect
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/feeds v1.1.1

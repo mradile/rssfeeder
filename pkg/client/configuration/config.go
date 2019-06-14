@@ -10,13 +10,20 @@ import (
 
 const ConfigFileName = "rssfeeder.json"
 
+var Path string
+
 type Configuration struct {
-	Hostname string `json:"hostname"`
-	Token    string `json:"token"`
-	Login    string `json:"login"`
+	Hostname     string `json:"hostname"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	Login        string `json:"login"`
 }
 
 func Save(cfg *Configuration, cfgPath string) error {
+	if cfgPath == "" {
+		cfgPath = Path
+	}
+
 	byts := ToJSON(cfg)
 	filepath := path.Join(cfgPath, ConfigFileName)
 
@@ -30,6 +37,8 @@ func Save(cfg *Configuration, cfgPath string) error {
 }
 
 func Load(cfgPath string) (*Configuration, error) {
+	Path = cfgPath
+
 	filepath := path.Join(cfgPath, ConfigFileName)
 	byts, err := ioutil.ReadFile(filepath)
 	if err != nil {

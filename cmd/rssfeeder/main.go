@@ -12,7 +12,6 @@ import (
 var version = "dev-snapshot"
 
 var debug bool
-var verbose bool
 
 func main() {
 
@@ -27,12 +26,6 @@ func main() {
 			Usage:       "prints debug level log messages",
 			EnvVar:      "LOG_DEBUG",
 			Destination: &debug,
-		},
-		cli.BoolFlag{
-			Name:        "verbose",
-			Usage:       "prints info level log messages",
-			EnvVar:      "LOG_VERBOSE",
-			Destination: &verbose,
 		},
 		cli.StringFlag{
 			Name:   "cfg",

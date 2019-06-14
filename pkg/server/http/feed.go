@@ -12,9 +12,9 @@ import (
 
 var feedTypes = [3]string{"atom", "rss", "json"}
 
-func (s *Server) ListFeeds(c echo.Context) error {
+func (h *Handler) ListFeeds(c echo.Context) error {
 	login := getLoginFromContext(c)
-	categories, err := s.viewer.GetCategories(login)
+	feeds, err := h.viewer.GetFeeds(login)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"error": err,
@@ -23,26 +23,27 @@ func (s *Server) ListFeeds(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not fetch feeds")
 	}
 
-	feedList := make([]*rest.Feed, 0, len(categories))
-	for _, cat := range categories {
+	feedList := make([]*rest.Feed, 0, len(feeds))
+	for _, feed := range feeds {
 		f := &rest.Feed{
-			Name: cat,
+			Name: feed.Name,
 			URIs: make([]string, 0, 3),
 		}
 		for _, feedType := range feedTypes {
-			uri := fmt.Sprintf("%s/feeds/%s/%s/%s/.rss",
-				s.cfg.Hostname,
+			uri := fmt.Sprintf("%s/feeds/%s/%s/%s/%s/.rss",
+				h.cfg.Hostname,
 				login,
-				cat,
+				feed.Token,
+				feed.Name,
 				feedType,
 			)
 			f.URIs = append(f.URIs, uri)
 		}
 		feedList = append(feedList, f)
 	}
-	feeds := &rest.FeedListResponse{
+	feedRes := &rest.FeedListResponse{
 		Feeds: feedList,
 	}
 
-	return c.JSONPretty(http.StatusOK, feeds, "  ")
+	return c.JSONPretty(http.StatusOK, feedRes, "  ")
 }

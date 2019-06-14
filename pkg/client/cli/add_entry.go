@@ -28,28 +28,28 @@ func (c *client) AddEntry() cli.Command {
 				return cli.NewExitError("please specify an uri", 1)
 			}
 
-			category := c.Args().Get(1)
-			if category == "" {
-				category = ""
-			}
+			feedName := c.Args().Get(1)
 
 			addReq := &rest.AddEntryRequest{
 				URI:      entry,
-				Category: category,
+				FeedName: feedName,
 			}
 
 			req, err := Client.makeHTTPRequest("POST", "/api/v1/entry", addReq)
 			if err != nil {
 				return cli.NewExitError(errors.Wrap(err, "could not add entry"), 1)
 			}
-			Client.setAuthHeader(req)
+			err = Client.setAuthHeader(req)
+			if err != nil {
+				return cli.NewExitError(errors.Wrap(err, "could not add entry"), 1)
+			}
 
 			var addRes rest.AddEntryResponse
 			if err := Client.getResponse(req, &addRes, http.StatusOK); err != nil {
 				return cli.NewExitError(errors.Wrap(err, "could not add entry"), 1)
 			}
 
-			fmt.Printf("added entry [%s] in category [%s] with id [%d]\n", entry, addRes.Category, addRes.ID)
+			LogInfo(fmt.Sprintf("added entry [%s] in feed [%s] with id [%d]\n", entry, addRes.FeedName, addRes.ID))
 
 			return nil
 		},

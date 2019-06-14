@@ -9,27 +9,29 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/mradile/rssfeeder"
-	"github.com/mradile/rssfeeder/pkg/server/adding"
 	"github.com/mradile/rssfeeder/pkg/server/configuration"
-	"github.com/mradile/rssfeeder/pkg/server/deleting"
-	"github.com/mradile/rssfeeder/pkg/server/viewing"
 )
+
+type Handler struct {
+	cfg     *configuration.Configuration
+	users   rssfeeder.UserStorage
+	adder   rssfeeder.AddingService
+	deleter rssfeeder.DeletingService
+	viewer  rssfeeder.ViewingService
+}
 
 type Server struct {
 	e          *echo.Echo
 	addr       string
 	cfg        *configuration.Configuration
 	httpServer *http.Server
-	users      rssfeeder.UserStorage
-	adder      adding.AddingService
-	deleter    deleting.DeletingService
-	viewer     viewing.ViewingService
+	handler    *Handler
 }
 
 type Services struct {
 }
 
-func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, adder adding.AddingService, deleter deleting.DeletingService, viewer viewing.ViewingService) *Server {
+func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, adder rssfeeder.AddingService, deleter rssfeeder.DeletingService, viewer rssfeeder.ViewingService) *Server {
 	e := echo.New()
 
 	//recover from panics
@@ -41,17 +43,23 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 	//set max body size for requests
 	e.Use(middleware.BodyLimit("10KB"))
 
+	e.Use(Logger())
+
 	e.HideBanner = true
 	e.HidePort = true
 
-	s := &Server{
-		e:       e,
-		addr:    cfg.Addr,
+	h := &Handler{
 		cfg:     cfg,
 		users:   users,
 		adder:   adder,
 		deleter: deleter,
 		viewer:  viewer,
+	}
+	s := &Server{
+		e:       e,
+		addr:    cfg.Addr,
+		cfg:     cfg,
+		handler: h,
 		httpServer: &http.Server{
 			Addr:              cfg.Addr,
 			ReadTimeout:       60 * time.Second,  // time to read request from client
@@ -62,15 +70,16 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 	}
 
 	auth := e.Group("/auth")
-	auth.POST("/login", s.Login)
+	auth.POST("/login", h.Login)
+	auth.POST("/refresh", h.RefreshAccessToken)
 
-	//http://localhost:3000/feeds/mre/fla/.rss
 	rss := e.Group("/feeds")
-	rss.GET("/:login/:category/:type/.rss", s.RSSFeed)
+	rss.GET("/:login/:token/:feed/:type/.rss", h.RSSFeed)
 
 	api := e.Group("/api/v1")
 	api.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningKey: []byte(cfg.SessionSecret),
+		SigningMethod: "HS256",
+		SigningKey:    []byte(cfg.SessionSecret),
 		ErrorHandler: func(err error) error {
 			if e, ok := err.(*jwt.ValidationError); ok {
 				if e.Errors == jwt.ValidationErrorExpired {
@@ -80,9 +89,9 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 			return err
 		},
 	}))
-	api.POST("/entry", s.AddEntry)
-	api.DELETE("/entry/:id", s.DeleteEntry)
-	api.GET("/feed", s.ListFeeds)
+	api.POST("/entry", h.AddEntry)
+	api.DELETE("/entry/:id", h.DeleteEntry)
+	api.GET("/feed", h.ListFeeds)
 
 	return s
 }

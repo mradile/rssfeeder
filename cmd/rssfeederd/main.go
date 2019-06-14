@@ -1,5 +1,7 @@
 package main
 
+// 1go:generate mockgen -destination=pkg/server/mock/adding.go -package=mock github.com/mradile/rssfeeder/pkg/server/adding AddingService
+
 import (
 	"context"
 	"fmt"
@@ -62,7 +64,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "hostname",
 			Usage:  "`hostname` that will be used in the rss feeds",
-			EnvVar: "HOSTNAME",
+			EnvVar: "HOST",
 			Value:  "http://localhost:3000",
 		},
 		cli.StringFlag{
@@ -74,7 +76,7 @@ func main() {
 			Name:   "session-ttl",
 			Usage:  "`ttl` of jwt session",
 			EnvVar: "SESSION_TTL",
-			Value:  time.Duration(time.Hour * 24 * 30),
+			Value:  time.Duration(time.Hour * 24 * 365),
 		},
 		cli.BoolFlag{
 			Name:   "create-user",
@@ -98,7 +100,11 @@ func main() {
 			Name:  "run",
 			Usage: "start the server",
 			Action: func(c *cli.Context) error {
-				cfg := makeConfig(c)
+				cfg, err := makeConfig(c)
+				if err != nil {
+					return cli.NewExitError(err, 1)
+				}
+
 				db, err := storage.NewStormDB(cfg)
 				if err != nil {
 					return cli.NewExitError(errors.Wrap(err, "could not open database"), 1)
@@ -106,10 +112,11 @@ func main() {
 
 				user := storage.NewUserStorage(db)
 				feedEntries := storage.NewFeedEntryStorage(db)
+				feeds := storage.NewFeedStorage(db)
 
-				adder := adding.NewAddingService(feedEntries)
+				adder := adding.NewAddingService(feedEntries, feeds)
 				deleter := deleting.NewDeletingService(feedEntries)
-				viewer := viewing.NewViewingService(feedEntries)
+				viewer := viewing.NewViewingService(feedEntries, feeds)
 
 				if err := createUser(user, c); err != nil {
 					return cli.NewExitError(errors.Wrap(err, "could not create user"), 1)
@@ -204,7 +211,7 @@ func createUser(users rssfeeder.UserStorage, c *cli.Context) error {
 	return users.Update(user)
 }
 
-func makeConfig(c *cli.Context) *configuration.Configuration {
+func makeConfig(c *cli.Context) (*configuration.Configuration, error) {
 	cfg := &configuration.Configuration{
 		DBPath:        c.GlobalString("db"),
 		Addr:          ":" + strconv.Itoa(c.GlobalInt("port")),
@@ -214,8 +221,8 @@ func makeConfig(c *cli.Context) *configuration.Configuration {
 	}
 
 	if cfg.SessionSecret == "" {
-		panic("secret must not be empty")
+		return nil, errors.New("secret parameter is mandatory")
 	}
 
-	return cfg
+	return cfg, nil
 }

@@ -10,10 +10,10 @@ import (
 	"strconv"
 )
 
-func (s *Server) RSSFeed(c echo.Context) error {
+func (h *Handler) RSSFeed(c echo.Context) error {
 	login := c.Param("login")
-	category := c.Param("category")
-	entries, err := s.viewer.GetFeed(category, login)
+	feedName := c.Param("feed")
+	entries, err := h.viewer.GetFeed(feedName, login)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"error": err,
@@ -28,7 +28,7 @@ func (s *Server) RSSFeed(c echo.Context) error {
 		return c.JSONPretty(http.StatusOK, entries, " ")
 	}
 
-	feed := s.makeFeed(entries, category)
+	feed := h.makeFeed(entries, feedName)
 
 	contentType := echo.MIMEApplicationXML
 	var feedError error
@@ -50,14 +50,14 @@ func (s *Server) RSSFeed(c echo.Context) error {
 	return c.Blob(http.StatusOK, contentType, []byte(content))
 }
 
-func (s *Server) makeFeed(entries []*rssfeeder.FeedEntry, category string) *feeds.Feed {
+func (h *Handler) makeFeed(entries []*rssfeeder.FeedEntry, feedName string) *feeds.Feed {
 	updated := entries[0].CreateDate
 	created := entries[len(entries)-1].CreateDate
 
 	f := &feeds.Feed{
-		Title:       fmt.Sprintf("RSS Feeder - %s", category),
-		Link:        &feeds.Link{Href: s.cfg.Hostname + "/"},
-		Description: category,
+		Title:       fmt.Sprintf("RSS Feeder - %s", feedName),
+		Link:        &feeds.Link{Href: h.cfg.Hostname + "/"},
+		Description: feedName,
 		Author:      &feeds.Author{Name: "rssfeeder"},
 		Created:     created,
 		Updated:     updated,

@@ -3,18 +3,19 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/mradile/rssfeeder/pkg/client/configuration"
 	"github.com/urfave/cli"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
 
 type client struct {
-	http    *http.Client
-	cfg     *configuration.Configuration
-	debug   bool
-	verbose bool
+	http  *http.Client
+	cfg   *configuration.Configuration
+	debug bool
 }
 
 var Client = &client{
@@ -34,9 +35,20 @@ func toJSONBytes(data interface{}) (io.Reader, error) {
 func setLogLevel(c *cli.Context) {
 	if c.GlobalBool("debug") {
 		Client.debug = true
+	}
+}
+
+func LogDebug(msg string) {
+	if !Client.debug {
 		return
 	}
-	if c.GlobalBool("verbose") {
-		Client.verbose = true
-	}
+	fmt.Println(msg)
+}
+
+func LogInfo(msg string) {
+	fmt.Println(msg)
+}
+
+func LogError(msg ...string) {
+	fmt.Fprintln(os.Stderr, msg)
 }
