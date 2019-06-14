@@ -49,6 +49,11 @@ func LogInfo(msg string) {
 	fmt.Println(msg)
 }
 
-func LogError(msg ...string) {
+func LogError(msg string) {
 	fmt.Fprintln(os.Stderr, msg)
+}
+
+func LogFatal(msg string) {
+	fmt.Fprintln(os.Stderr, msg)
+	os.Exit(1)
 }

@@ -3,6 +3,7 @@ package configuration
 import (
 	"encoding/json"
 	"fmt"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"path"
@@ -20,8 +21,14 @@ type Configuration struct {
 }
 
 func Save(cfg *Configuration, cfgPath string) error {
-	if cfgPath == "" {
+	if Path != "" {
 		cfgPath = Path
+	} else if cfgPath == "" {
+		var err error
+		cfgPath, err = getDefaultConfigPath()
+		if err != nil {
+			return err
+		}
 	}
 
 	byts := ToJSON(cfg)
@@ -57,4 +64,12 @@ func ToJSON(cfg *Configuration) []byte {
 		panic(fmt.Sprintf("could not marshal config to json: %s", err))
 	}
 	return byts
+}
+
+func getDefaultConfigPath() (string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		return "", errors.Wrap(err, "could not determine config default path: %v")
+	}
+	return path.Join(home, "/.config"), nil
 }
