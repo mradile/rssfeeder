@@ -47,6 +47,7 @@ docker:
 
 .PHONY: docker-publish
 docker-publish: docker
+	docker tag mradile/rssfeeder mradile/rssfeeder:latest
 	docker tag mradile/rssfeeder mradile/rssfeeder:${VERSION}
-	docker push mradile/rssfeeder
+	docker push mradile/rssfeeder:latest
 	docker push mradile/rssfeeder:${VERSION}
