@@ -30,7 +30,7 @@ func (a *adder) AddFeedEntry(entry *rssfeeder.FeedEntry) error {
 		entry.FeedName = rssfeeder.DefaultFeedName
 	}
 
-	exists, err := a.feeds.Exists(entry.FeedName, entry.Login)
+	exists, err := a.feeds.Exists(entry.Login, entry.FeedName)
 	if err != nil {
 		return errors.Wrap(err, "could not fetch feed for adding feed entry")
 	}
