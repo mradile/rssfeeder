@@ -2,8 +2,10 @@ package http
 
 import (
 	"fmt"
+	"github.com/mradile/rssfeeder"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"strconv"
 
 	"github.com/mradile/rssfeeder/pkg/rest"
 
@@ -27,6 +29,7 @@ func (h *Handler) ListFeeds(c echo.Context) error {
 	for _, feed := range feeds {
 		f := &rest.Feed{
 			Name: feed.Name,
+			ID:   feed.ID,
 			URIs: make([]string, 0, 3),
 		}
 		for _, feedType := range feedTypes {
@@ -46,4 +49,29 @@ func (h *Handler) ListFeeds(c echo.Context) error {
 	}
 
 	return c.JSONPretty(http.StatusOK, feedRes, "  ")
+}
+
+func (h *Handler) DeleteFeed(c echo.Context) error {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "id must be of type integer")
+	}
+
+	login := getLoginFromContext(c)
+
+	if err := h.deleter.DeleteFeed(id, login); err != nil {
+		if err == rssfeeder.ErrEmptyLogin || err == rssfeeder.ErrNotAllowed || err == rssfeeder.ErrFeedMissing {
+			return echo.NewHTTPError(http.StatusForbidden, "feed not found")
+		}
+
+		logrus.WithFields(logrus.Fields{
+			"id":    id,
+			"login": login,
+			"error": err,
+		}).Error("could not delete feed")
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not delete entry")
+	}
+
+	return c.NoContent(http.StatusNoContent)
 }

@@ -24,7 +24,7 @@ var Client = &client{
 	},
 }
 
-func toJSONBytes(data interface{}) (io.Reader, error) {
+func toJSONReader(data interface{}) (io.Reader, error) {
 	byts, err := json.Marshal(data)
 	if err != nil {
 		return nil, err

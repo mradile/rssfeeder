@@ -70,6 +70,19 @@ func (mr *MockFeedStorageMockRecorder) Exists(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exists", reflect.TypeOf((*MockFeedStorage)(nil).Exists), arg0, arg1)
 }
 
+// Get mocks base method
+func (m *MockFeedStorage) Get(arg0 int) (*rssfeeder.Feed, error) {
+	ret := m.ctrl.Call(m, "Get", arg0)
+	ret0, _ := ret[0].(*rssfeeder.Feed)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get
+func (mr *MockFeedStorageMockRecorder) Get(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockFeedStorage)(nil).Get), arg0)
+}
+
 // GetByNameAndLogin mocks base method
 func (m *MockFeedStorage) GetByNameAndLogin(arg0, arg1 string) (*rssfeeder.Feed, error) {
 	ret := m.ctrl.Call(m, "GetByNameAndLogin", arg0, arg1)
@@ -180,19 +193,6 @@ func (m *MockFeedEntryStorage) ExistsEntry(arg0 int) (bool, error) {
 // ExistsEntry indicates an expected call of ExistsEntry
 func (mr *MockFeedEntryStorageMockRecorder) ExistsEntry(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsEntry", reflect.TypeOf((*MockFeedEntryStorage)(nil).ExistsEntry), arg0)
-}
-
-// GetCategories mocks base method
-func (m *MockFeedEntryStorage) GetCategories(arg0 string) ([]string, error) {
-	ret := m.ctrl.Call(m, "GetCategories", arg0)
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCategories indicates an expected call of GetCategories
-func (mr *MockFeedEntryStorageMockRecorder) GetCategories(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCategories", reflect.TypeOf((*MockFeedEntryStorage)(nil).GetCategories), arg0)
 }
 
 // MockAddingService is a mock of AddingService interface

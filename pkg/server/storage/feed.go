@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"github.com/asdine/storm"
 	"github.com/asdine/storm/q"
 	"github.com/mradile/rssfeeder"
@@ -67,6 +68,19 @@ func (fs *feedStorage) Add(feed *rssfeeder.Feed) error {
 	return nil
 }
 
+func (fs *feedStorage) Get(id int) (*rssfeeder.Feed, error) {
+	var f Feed
+	err := fs.db.One("ID", id, &f)
+	if err != nil {
+		if err == storm.ErrNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return f.fromDBFeed(), nil
+}
+
 func (fs *feedStorage) Exists(login, name string) (bool, error) {
 	f, err := fs.GetByNameAndLogin(login, name)
 	if err != nil {
@@ -94,7 +108,34 @@ func (fs *feedStorage) GetByNameAndLogin(login, name string) (*rssfeeder.Feed, e
 }
 
 func (fs *feedStorage) Delete(id int) error {
-	panic("implement me")
+	feed, err := fs.Get(id)
+	if err != nil {
+		return errors.Wrap(err, "could not fetch feed")
+	}
+
+	if feed == nil {
+		return fmt.Errorf("feed does not exist")
+	}
+
+	//this should be done in a transaction. Unfortunately this will trigger a transaction in a transaction which will block forever.
+	var entries []*FeedEntry
+	query := fs.db.Select(q.And(
+		q.Eq("Login", feed.Login),
+		q.Eq("FeedName", feed.Name),
+	))
+	if err := query.Find(&entries); err != nil {
+		if err != storm.ErrNotFound {
+			return errors.Wrap(err, "could not fetch feed entries")
+		}
+	}
+	for _, entry := range entries {
+		err := fs.db.DeleteStruct(&FeedEntry{ID: entry.ID})
+		if err != nil {
+			return errors.Wrap(err, "could not delete feed entry")
+		}
+	}
+
+	return fs.db.DeleteStruct(&Feed{ID: id})
 }
 
 func (fs *feedStorage) GetFeedsByLogin(login string) ([]*rssfeeder.Feed, error) {

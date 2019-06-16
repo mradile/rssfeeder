@@ -115,7 +115,7 @@ func main() {
 				feeds := storage.NewFeedStorage(db)
 
 				adder := adding.NewAddingService(feedEntries, feeds)
-				deleter := deleting.NewDeletingService(feedEntries)
+				deleter := deleting.NewDeletingService(feedEntries, feeds)
 				viewer := viewing.NewViewingService(feedEntries, feeds)
 
 				if err := createUser(user, c); err != nil {

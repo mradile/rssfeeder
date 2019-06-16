@@ -55,6 +55,10 @@ func (h *Handler) DeleteEntry(c echo.Context) error {
 	login := getLoginFromContext(c)
 
 	if err := h.deleter.DeleteFeedEntry(id, login); err != nil {
+		if err == rssfeeder.ErrEntryMissing {
+			return echo.NewHTTPError(http.StatusNotFound, "feed entry not found")
+		}
+
 		logrus.WithFields(logrus.Fields{
 			"id":    id,
 			"login": login,

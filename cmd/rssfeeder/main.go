@@ -39,6 +39,8 @@ func main() {
 	cmds = append(cmds, c.Client.Login())
 	cmds = append(cmds, c.Client.AddEntry())
 	cmds = append(cmds, c.Client.ListFeeds())
+	cmds = append(cmds, c.Client.DeleteFeed())
+	cmds = append(cmds, c.Client.DeleteFeedEntry())
 	cliApp.Commands = cmds
 
 	err := cliApp.Run(os.Args)

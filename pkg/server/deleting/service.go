@@ -4,40 +4,54 @@ import (
 	"github.com/mradile/rssfeeder"
 )
 
-type adder struct {
+type deleter struct {
 	entries rssfeeder.FeedEntryStorage
+	feeds   rssfeeder.FeedStorage
 }
 
-func NewDeletingService(entryStore rssfeeder.FeedEntryStorage) rssfeeder.DeletingService {
-	a := &adder{
-		entries: entryStore,
+func NewDeletingService(entries rssfeeder.FeedEntryStorage, feeds rssfeeder.FeedStorage) rssfeeder.DeletingService {
+	a := &deleter{
+		entries: entries,
+		feeds:   feeds,
 	}
 	return a
 }
 
-func (a *adder) DeleteFeedEntry(id int, login string) error {
-	panic("not implemented")
-	/*
-		if login == "" {
-			return rssfeeder.ErrEmptyLogin
-		}
+func (d *deleter) DeleteFeed(id int, login string) error {
+	if login == "" {
+		return rssfeeder.ErrEmptyLogin
+	}
 
-		if belongs, err := a.entries.EntryBelongsToLogin(id, login); err != nil {
-			return err
-		} else if !belongs {
-			return rssfeeder.ErrNotAllowed
-		}
+	feed, err := d.feeds.Get(id)
+	if err != nil {
+		return err
+	}
 
-		if exists, err := a.entries.ExistsEntry(id); err != nil {
-			return err
-		} else if !exists {
-			return rssfeeder.ErrEntryMissing
-		}
-		if err := a.entries.Delete(id); err != nil {
-			return err
-		}
+	if feed == nil {
+		return rssfeeder.ErrFeedMissing
+	}
 
-		return nil
+	if login != feed.Login {
+		return rssfeeder.ErrNotAllowed
+	}
 
-	*/
+	return d.feeds.Delete(id)
+}
+
+func (d *deleter) DeleteFeedEntry(id int, login string) error {
+	if login == "" {
+		return rssfeeder.ErrEmptyLogin
+	}
+
+	if existsForLogin, err := d.entries.EntryBelongsToLogin(id, login); err != nil {
+		return err
+	} else if !existsForLogin {
+		return rssfeeder.ErrEntryMissing
+	}
+
+	if err := d.entries.Delete(id); err != nil {
+		return err
+	}
+
+	return nil
 }

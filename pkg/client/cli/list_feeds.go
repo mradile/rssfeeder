@@ -39,7 +39,7 @@ func (c *client) ListFeeds() cli.Command {
 
 			fmt.Println("Feeds:")
 			for _, feed := range list.Feeds {
-				fmt.Printf("%s\n", feed.Name)
+				fmt.Printf("Feed: %s [ID: %d]\n", feed.Name, feed.ID)
 				for _, uri := range feed.URIs {
 					fmt.Printf("\t%s\n", uri)
 				}

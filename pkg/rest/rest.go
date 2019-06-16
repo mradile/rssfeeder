@@ -42,5 +42,11 @@ type FeedListResponse struct {
 //Feed is a representation of a RSS Feed for the client
 type Feed struct {
 	Name string   `json:"name"`
+	ID   int      `json:"id"`
 	URIs []string `json:"uris"`
+}
+
+//ErrorResponse is a general error response
+type ErrorResponse struct {
+	Message string `json:"message"`
 }

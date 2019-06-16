@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"net/http"
 
@@ -46,12 +47,13 @@ func (c *client) Login() cli.Command {
 				return cli.NewExitError("could not login, received empty token", 1)
 			}
 
+			LogInfo(fmt.Sprintf("successfully logged in as user %s", loginReq.Login))
+
 			Client.cfg.AccessToken = token.AccessToken
 			Client.cfg.RefreshToken = token.RefreshToken
 			Client.cfg.Login = loginReq.Login
-
 			if err := configuration.Save(Client.cfg, c.GlobalString("cfg")); err != nil {
-				return cli.NewExitError(errors.Wrap(err, "could save configuration after login"), 1)
+				return cli.NewExitError(errors.Wrap(err, "could not save configuration after login"), 1)
 			}
 
 			return nil

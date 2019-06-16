@@ -15,6 +15,7 @@ type Feed struct {
 //FeedStorage manages persistence of a RSS feed
 type FeedStorage interface {
 	Add(feed *Feed) error
+	Get(id int) (*Feed, error)
 	Exists(login, name string) (bool, error)
 	GetByNameAndLogin(login, name string) (*Feed, error)
 	Delete(id int) error
@@ -40,7 +41,6 @@ type FeedEntryStorage interface {
 	AllByLoginAndFeedName(login string, feedName string) ([]*FeedEntry, error)
 	ExistsEntry(id int) (bool, error)
 	EntryBelongsToLogin(id int, login string) (bool, error)
-	GetCategories(login string) ([]string, error)
 }
 
 type AddingService interface {
@@ -48,6 +48,7 @@ type AddingService interface {
 }
 
 type DeletingService interface {
+	DeleteFeed(id int, login string) error
 	DeleteFeedEntry(id int, login string) error
 }
 

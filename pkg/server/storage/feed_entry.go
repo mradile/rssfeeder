@@ -66,7 +66,7 @@ func (s *feedEntryStorage) Add(entry *rssfeeder.FeedEntry) error {
 }
 
 func (s *feedEntryStorage) Delete(id int) error {
-	return s.db.DeleteStruct(&rssfeeder.FeedEntry{ID: id})
+	return s.db.DeleteStruct(&FeedEntry{ID: id})
 }
 
 func (s *feedEntryStorage) AllByLoginAndFeedName(login string, feedName string) ([]*rssfeeder.FeedEntry, error) {
@@ -115,27 +115,4 @@ func (s *feedEntryStorage) EntryBelongsToLogin(id int, login string) (bool, erro
 		return false, err
 	}
 	return true, nil
-}
-
-func (s *feedEntryStorage) GetCategories(login string) ([]string, error) {
-	query := s.db.Select(q.And(
-		q.Eq("Login", login),
-	)).OrderBy("FeedName")
-
-	var entries []*FeedEntry
-	if err := query.Find(&entries); err != nil {
-		return nil, err
-	}
-
-	allCats := make(map[string]bool)
-	for _, entry := range entries {
-		allCats[entry.FeedName] = true
-	}
-
-	categories := make([]string, 0, len(allCats))
-	for cat := range allCats {
-		categories = append(categories, cat)
-	}
-
-	return categories, nil
 }

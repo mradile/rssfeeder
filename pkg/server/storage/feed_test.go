@@ -28,6 +28,14 @@ func Test_Feeds(t *testing.T) {
 	f3, err := testAddFeed("fff", "a", "", fs)
 	f4, err := testAddFeed("ggg", "g", "", fs)
 
+	//get a feed
+	nilFeed, err := fs.Get(0)
+	assert.Nil(t, err)
+	assert.Nil(t, nilFeed)
+	gotF1, err := fs.Get(f1.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, f1, gotF1)
+
 	//exists f1, f2, f3
 	exists, err := fs.Exists(f1.Login, f1.Name)
 	assert.Nil(t, err)
@@ -63,6 +71,48 @@ func Test_Feeds(t *testing.T) {
 	feedsGot, err := fs.GetFeedsByLogin(f1.Login)
 	assert.Nil(t, err)
 	assert.Equal(t, feedsExp, feedsGot)
+}
+
+func Test_Feeds_Delete(t *testing.T) {
+	fs := setupNewFeedStorage(t)
+	fes := NewFeedEntryStorage(fs.(*feedStorage).db)
+	defer fs.(*feedStorage).db.Close()
+
+	//delete not existing feed
+	assert.Error(t, fs.Delete(0)) //does not exist
+
+	//delete feed without entries
+	fe, _ := testAddFeed("z", "z", "", fs)
+	assert.NoError(t, fs.Delete(fe.ID))
+	deletedFab, err := fs.Get(fe.ID)
+	assert.Nil(t, err)
+	assert.Nil(t, deletedFab)
+
+	faa, _ := testAddFeed("a", "a", "", fs)
+	assert.NoError(t, fes.Add(&rssfeeder.FeedEntry{
+		Login:    "a",
+		FeedName: "a",
+		URI:      "a",
+	}))
+	fba, _ := testAddFeed("a", "b", "", fs)
+	fbaEntry := &rssfeeder.FeedEntry{
+		Login:    "b",
+		FeedName: "a",
+		URI:      "a",
+	}
+	assert.NoError(t, fes.Add(fbaEntry))
+
+	assert.NoError(t, fs.Delete(faa.ID))
+	emptyList, err := fes.AllByLoginAndFeedName(faa.Login, faa.Name)
+	assert.Nil(t, err)
+	assert.Nil(t, emptyList)
+
+	fbaGot, err := fs.Get(fba.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, fba, fbaGot)
+	fbaEntries, err := fes.AllByLoginAndFeedName(fba.Login, fba.Name)
+	assert.Nil(t, err)
+	assert.Equal(t, fbaEntry.ID, fbaEntries[0].ID)
 
 }
 

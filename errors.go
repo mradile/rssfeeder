@@ -7,4 +7,5 @@ var (
 	ErrEmptyURI     = errors.New("uri is empty")
 	ErrNotAllowed   = errors.New("not allowed")
 	ErrEntryMissing = errors.New("entry does not exist")
+	ErrFeedMissing  = errors.New("feed does not exist")
 )

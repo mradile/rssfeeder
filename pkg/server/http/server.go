@@ -89,9 +89,12 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 			return err
 		},
 	}))
+
 	api.POST("/entry", h.AddEntry)
 	api.DELETE("/entry/:id", h.DeleteEntry)
+
 	api.GET("/feed", h.ListFeeds)
+	api.DELETE("/feed/:id", h.DeleteFeed)
 
 	return s
 }
