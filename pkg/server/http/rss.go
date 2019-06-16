@@ -51,17 +51,19 @@ func (h *Handler) RSSFeed(c echo.Context) error {
 }
 
 func (h *Handler) makeFeed(entries []*rssfeeder.FeedEntry, feedName string) *feeds.Feed {
-	updated := entries[0].CreateDate
-	created := entries[len(entries)-1].CreateDate
-
 	f := &feeds.Feed{
 		Title:       fmt.Sprintf("RSS Feeder - %s", feedName),
 		Link:        &feeds.Link{Href: h.cfg.Hostname + "/"},
 		Description: feedName,
 		Author:      &feeds.Author{Name: "rssfeeder"},
-		Created:     created,
-		Updated:     updated,
 	}
+
+	if len(entries) < 1 {
+		return f
+	}
+
+	f.Updated = entries[0].CreateDate
+	f.Created = entries[len(entries)-1].CreateDate
 
 	items := make([]*feeds.Item, 0, len(entries))
 	for _, entry := range entries {
