@@ -53,15 +53,6 @@ func (c *client) AddEntry() cli.Command {
 
 			return nil
 		},
-		OnUsageError:       nil,
-		Subcommands:        nil,
-		Flags:              nil,
-		SkipFlagParsing:    false,
-		SkipArgReorder:     false,
-		HideHelp:           false,
-		Hidden:             false,
-		HelpName:           "",
-		CustomHelpTemplate: "",
 	}
 	return cmd
 }
