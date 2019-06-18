@@ -69,6 +69,14 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 		},
 	}
 
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "RSS Feeder")
+	})
+
+	e.GET("/health", func(c echo.Context) error {
+		return c.String(http.StatusOK, "OK")
+	})
+
 	auth := e.Group("/auth")
 	auth.POST("/login", h.Login)
 	auth.POST("/refresh", h.RefreshAccessToken)
