@@ -7,7 +7,6 @@ import (
 	"github.com/mradile/rssfeeder"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
 )
 
 func (h *Handler) RSSFeed(c echo.Context) error {
@@ -75,7 +74,7 @@ func (h *Handler) makeFeed(entries []*rssfeeder.FeedEntry, feedName string) *fee
 			//Description: desc,
 			//Author:      &feeds.Author{Name: "", Email: ""},
 			Created: entry.CreateDate,
-			Id:      strconv.Itoa(entry.ID),
+			Id:      fmt.Sprintf("%s/%d", h.cfg.Hostname, entry.ID),
 		}
 		items = append(items, fi)
 	}
