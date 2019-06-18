@@ -30,7 +30,7 @@ func (h *Handler) RSSFeed(c echo.Context) error {
 
 	feed := h.makeFeed(entries, feedName)
 
-	contentType := echo.MIMEApplicationXML
+	var contentType string
 	var feedError error
 	var content string
 	switch feedType {
@@ -39,8 +39,10 @@ func (h *Handler) RSSFeed(c echo.Context) error {
 		contentType = echo.MIMEApplicationJSON
 	case "rss":
 		content, feedError = feed.ToRss()
+		contentType = "application/rss+xml"
 	default:
 		content, feedError = feed.ToAtom()
+		contentType = "application/atom+xml"
 	}
 
 	if feedError != nil {
