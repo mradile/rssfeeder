@@ -253,6 +253,18 @@ func (m *MockDeletingService) EXPECT() *MockDeletingServiceMockRecorder {
 	return m.recorder
 }
 
+// DeleteFeed mocks base method
+func (m *MockDeletingService) DeleteFeed(arg0 int, arg1 string) error {
+	ret := m.ctrl.Call(m, "DeleteFeed", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteFeed indicates an expected call of DeleteFeed
+func (mr *MockDeletingServiceMockRecorder) DeleteFeed(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFeed", reflect.TypeOf((*MockDeletingService)(nil).DeleteFeed), arg0, arg1)
+}
+
 // DeleteFeedEntry mocks base method
 func (m *MockDeletingService) DeleteFeedEntry(arg0 int, arg1 string) error {
 	ret := m.ctrl.Call(m, "DeleteFeedEntry", arg0, arg1)
