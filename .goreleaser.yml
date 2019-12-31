@@ -72,7 +72,7 @@ release:
   draft: true
   prerelease: auto
   name_template: "{{.ProjectName}}-v{{.Version}}"
-  disable: true
+  disable: false
 
 changelog:
   sort: asc
