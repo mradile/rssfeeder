@@ -85,7 +85,6 @@ dockers:
   -
     goos: linux
     goarch: amd64
-    goarm: ''
     binaries:
       - rssfeederd
     image_templates:
@@ -94,7 +93,6 @@ dockers:
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}"
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}.{{.Patch}}"
     skip_push: auto
-    # Path to the Dockerfile (from the project root).
     dockerfile: Dockerfile
     build_flag_templates:
       - "--label=org.label-schema.schema-version=1.0"
@@ -103,7 +101,6 @@ dockers:
   -
     goos: linux
     goarch: arm64
-    goarm: ''
     binaries:
       - rssfeederd
     image_templates:
@@ -112,7 +109,6 @@ dockers:
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}"
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}.{{.Patch}}"
     skip_push: auto
-    # Path to the Dockerfile (from the project root).
     dockerfile: Dockerfile
     build_flag_templates:
       - "--label=org.label-schema.schema-version=1.0"
@@ -130,7 +126,6 @@ dockers:
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}"
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}.{{.Patch}}"
     skip_push: auto
-    # Path to the Dockerfile (from the project root).
     dockerfile: Dockerfile
     build_flag_templates:
       - "--label=org.label-schema.schema-version=1.0"
@@ -148,7 +143,6 @@ dockers:
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}"
       - "mradile/rssfeeder:{{ .Major }}.{{ .Minor }}.{{.Patch}}"
     skip_push: auto
-    # Path to the Dockerfile (from the project root).
     dockerfile: Dockerfile
     build_flag_templates:
       - "--label=org.label-schema.schema-version=1.0"
