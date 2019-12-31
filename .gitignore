@@ -14,5 +14,7 @@
 .idea/*
 
 release
+dist
+
 rssfeeder.db
 rssfeeder.json

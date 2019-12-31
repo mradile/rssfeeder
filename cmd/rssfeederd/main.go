@@ -22,7 +22,11 @@ import (
 	"time"
 )
 
-var version = "dev-snapshot"
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
 
 var debug bool
 var verbose bool
@@ -33,6 +37,8 @@ func main() {
 	cliApp.Name = "rssfeeder server"
 	cliApp.Usage = ""
 	cliApp.Version = version
+	cliApp.Copyright = "Martin Radile"
+	cliApp.Description = fmt.Sprintf("git sha [%s],  build date [%s]", commit, date)
 
 	//host=%s port=%d user=%s dbname=%s password=%s sslmode=%s
 

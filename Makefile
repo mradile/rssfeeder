@@ -1,12 +1,11 @@
-VERSION := `cat VERSION`
 PKG = github.com/mradile/rssfeeder
 
 all: vet lint cover build
 
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -i -v -o release/rssfeeder -ldflags="-X main.version=${VERSION}" cmd/rssfeeder/*.go
-	CGO_ENABLED=0 go build -i -v -o release/rssfeederd -ldflags="-X main.version=${VERSION}" cmd/rssfeederd/*.go
+	CGO_ENABLED=0 go build -i -v -o release/rssfeeder cmd/rssfeeder/*.go
+	CGO_ENABLED=0 go build -i -v -o release/rssfeederd cmd/rssfeederd/*.go
 
 .PHONY: install
 install:
@@ -41,13 +40,3 @@ clean:
 	rm -rf release/*
 	go clean -testcache
 
-.PHONY: docker
-docker:
-	docker build -t mradile/rssfeeder .
-
-.PHONY: docker-publish
-docker-publish: docker
-	docker tag mradile/rssfeeder mradile/rssfeeder:latest
-	docker tag mradile/rssfeeder mradile/rssfeeder:${VERSION}
-	docker push mradile/rssfeeder:latest
-	docker push mradile/rssfeeder:${VERSION}

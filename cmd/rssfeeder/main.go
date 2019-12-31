@@ -9,7 +9,11 @@ import (
 	"github.com/urfave/cli"
 )
 
-var version = "dev-snapshot"
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
 
 var debug bool
 
@@ -19,6 +23,8 @@ func main() {
 	cliApp.Name = "rssfeeder client"
 	cliApp.Usage = ""
 	cliApp.Version = version
+	cliApp.Copyright = "Martin Radile"
+	cliApp.Description = fmt.Sprintf("git [%s], build [%s]", commit, date)
 
 	cliApp.Flags = []cli.Flag{
 		cli.BoolFlag{
