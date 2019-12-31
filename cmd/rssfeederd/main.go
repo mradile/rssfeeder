@@ -219,6 +219,7 @@ func createUser(users rssfeeder.UserStorage, c *cli.Context) error {
 
 func makeConfig(c *cli.Context) (*configuration.Configuration, error) {
 	cfg := &configuration.Configuration{
+		Version:       version,
 		DBPath:        c.GlobalString("db"),
 		Addr:          ":" + strconv.Itoa(c.GlobalInt("port")),
 		Hostname:      c.GlobalString("hostname"),

@@ -74,7 +74,7 @@ func NewServer(cfg *configuration.Configuration, users rssfeeder.UserStorage, ad
 	})
 
 	e.GET("/health", func(c echo.Context) error {
-		return c.String(http.StatusOK, "OK")
+		return c.JSONPretty(http.StatusOK, map[string]string{"status": "ok", "version": cfg.Version}, "  ")
 	})
 
 	auth := e.Group("/auth")
