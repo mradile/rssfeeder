@@ -162,3 +162,4 @@ brews:
       owner: mradile
       name: homebrew-tap
     homepage: "https://github.com/mradile/rssfeeder"
+    skip_upload: auto
