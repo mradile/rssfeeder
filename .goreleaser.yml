@@ -69,10 +69,9 @@ release:
   github:
     owner: mradile
     name: rssfeeder
-  draft: true
+  draft: false
   prerelease: auto
   name_template: "{{.ProjectName}}-v{{.Version}}"
-  disable: false
 
 changelog:
   sort: asc
