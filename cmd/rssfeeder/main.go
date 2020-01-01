@@ -37,7 +37,6 @@ func main() {
 			Name:   "cfg",
 			Usage:  "config `directory`",
 			EnvVar: "CONFIG_DIRECTORY",
-			Value:  "",
 		},
 	}
 

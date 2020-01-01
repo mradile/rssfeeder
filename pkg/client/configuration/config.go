@@ -44,6 +44,14 @@ func Save(cfg *Configuration, cfgPath string) error {
 }
 
 func Load(cfgPath string) (*Configuration, error) {
+	if cfgPath == "" {
+		if p, err := getDefaultConfigPath(); err != nil {
+			return nil, err
+		} else {
+			cfgPath = p
+		}
+	}
+
 	Path = cfgPath
 
 	filepath := path.Join(cfgPath, ConfigFileName)
