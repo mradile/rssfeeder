@@ -7,7 +7,7 @@ require (
 	github.com/Sereal/Sereal v0.0.0-20190523190202-f3c5c39c5c5d // indirect
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/golang/mock v1.3.1
+	github.com/golang/mock v1.5.0
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/feeds v1.1.1
@@ -21,7 +21,7 @@ require (
 	github.com/urfave/cli v1.20.0
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
