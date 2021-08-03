@@ -12,16 +12,15 @@ require (
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/feeds v1.1.1
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/labstack/echo/v4 v4.1.5
-	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/labstack/echo/v4 v4.5.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/urfave/cli v1.20.0
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	google.golang.org/appengine v1.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
